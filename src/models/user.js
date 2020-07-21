@@ -35,6 +35,12 @@ const userSchema = new mongoose.Schema(
                 },
             },
         ],
+        forgetToken: {
+            type: String,
+        },
+        forgetExpire: {
+            type: String,
+        },
     },
     { timestamps: true }
 );
@@ -51,6 +57,23 @@ userSchema.methods.genAuthToken = function () {
         )
         .toString();
     user.tokens.push({ token });
+    return user.save().then(() => {
+        return token;
+    });
+};
+
+userSchema.methods.genForgetToken = function () {
+    let user = this;
+    let token = jwt
+        .sign(
+            {
+                _id: user._id.toHexString(),
+            },
+            process.env.JWT_KEY
+        )
+        .toString();
+    user.forgetToken = token;
+    user.forgetExpire = Date.now() * 3600000;
     return user.save().then(() => {
         return token;
     });
