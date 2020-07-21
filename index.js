@@ -5,6 +5,7 @@ const morgan = require("morgan");
 const path = require("path");
 const rfs = require("rotating-file-stream");
 const mongoose = require("mongoose");
+const cors = require("cors");
 mongoose.connect(process.env.URI, {
     useNewUrlParser: true,
     useFindAndModify: false,
@@ -14,6 +15,11 @@ mongoose.connect(process.env.URI, {
 
 const app = express();
 const httpServer = http.createServer(app);
+
+const corsOptions = {
+    exposedHeaders: "x-auth ",
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 const port = process.env.PORT;
 let accessLogStream = rfs.createStream("requests.log", {

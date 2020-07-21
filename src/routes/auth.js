@@ -16,6 +16,14 @@ const RegisterValidator = (user) => {
 
     return schema.validate(user);
 };
+const LoginValidator = (user) => {
+    const schema = Joi.object({
+        email: Joi.string().email().max(255).required(),
+        password: Joi.string().min(8).max(1024).required(),
+    });
+
+    return schema.validate(user);
+};
 
 router.post("/register", async (req, res) => {
     try {
@@ -27,12 +35,29 @@ router.post("/register", async (req, res) => {
         if (!user) {
             const newUser = await new User(body);
             newUser.save().then((user) => {
-                user.genAuthToken();
-                res.status(200).send();
+                user.genAuthToken().then((token) => {
+                    res.header("x-auth", token).status(200).send();
+                });
             });
         } else {
             res.status(400).send("This email already exists");
         }
+    } catch (err) {
+        res.status(400).send(err);
+    }
+});
+
+router.post("/login", async (req, res) => {
+    try {
+        const { error } = await LoginValidator(req.body);
+        if (error) return res.status(400).send(error.details[0].message);
+        const user = await User.findByCredentials(
+            req.body.email,
+            req.body.password
+        );
+        const token = await user.genAuthToken();
+
+        res.header("x-auth", token).status(200).send();
     } catch (err) {
         res.status(400).send(err);
     }
