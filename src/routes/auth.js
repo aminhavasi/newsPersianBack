@@ -119,7 +119,10 @@ router.post("/recovery", async (req, res) => {
 router.post("/reset/:token", async (req, res) => {
     try {
         //expire time not added now.
-        let user = await User.findOne({ forgetToken: req.params.token });
+        let user = await User.findOne({
+            forgetToken: req.params.token,
+            forgetExpire: { $gt: Date.now() },
+        });
         if (!user) {
             return res.status(400).send("Invalid token or emailLink");
         }
