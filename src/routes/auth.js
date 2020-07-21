@@ -4,9 +4,9 @@ const Joi = require("joi");
 const _ = require("lodash");
 const persianDate = require("persian-date");
 const nodemailer = require("nodemailer");
+const config = require("./../../config.json");
 
 const User = require("./../models/user");
-const SMTPConnection = require("nodemailer/lib/smtp-connection");
 persianDate.toLocale("en");
 const date = new persianDate().format("YYYY/M/DD");
 //---------------------------------------------------------------
@@ -89,7 +89,7 @@ router.post("/recovery", async (req, res) => {
             secure: true, // use SSL
             auth: {
                 user: "testpau@chmail.ir",
-                pass: "F1334m1345a1375",
+                pass: config.password,
             },
         });
 
@@ -98,7 +98,7 @@ router.post("/recovery", async (req, res) => {
             to: "aminhavasi1996@gmail.com",
             subject: "recoveryPassword",
             text: `for reset password please click on below link\n\n  
-            http://${req.headers.host}/api/auth/reset/${token}`,
+            http://${req.headers.host}/reset/${token}`,
         };
 
         await transporter.sendMail(mailOptions, function (error, info) {
