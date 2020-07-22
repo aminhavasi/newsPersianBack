@@ -34,6 +34,13 @@ const RecoveryValidator = (user) => {
 
     return schema.validate(user);
 };
+const RecoveryPasswordValidator = (user) => {
+    const schema = Joi.object({
+        password: Joi.string().max(1024).required(),
+    });
+
+    return schema.validate(user);
+};
 //---------------------------------------------------------------
 router.post("/register", async (req, res) => {
     try {
@@ -88,14 +95,14 @@ router.post("/recovery", async (req, res) => {
             port: 465,
             secure: true, // use SSL
             auth: {
-                user: "testpau@chmail.ir",
+                user: config.email,
                 pass: config.password,
             },
         });
 
         let mailOptions = {
-            from: "testpau@chmail.ir",
-            to: "aminhavasi1996@gmail.com",
+            from: config.email,
+            to: user.email.toString(),
             subject: "recoveryPassword",
             text: `for reset password please click on below link\n\n  
             http://${req.headers.host}/reset/${token}`,
@@ -118,7 +125,8 @@ router.post("/recovery", async (req, res) => {
 
 router.post("/reset/:token", async (req, res) => {
     try {
-        //expire time not added now.
+        const { error } = await RecoveryPasswordValidator(req.body);
+        if (error) return res.status(400).send(error.details[0].message);
         let user = await User.findOne({
             forgetToken: req.params.token,
             forgetExpire: { $gt: Date.now() },
