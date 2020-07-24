@@ -53,7 +53,7 @@ router.post("/register", async (req, res) => {
             const newUser = await new User(body);
             newUser.save().then((user) => {
                 user.genAuthToken().then((token) => {
-                    res.header("x-auth", token).status(200).send();
+                    res.header("x-auth", token).status(201).send();
                 });
             });
         } else {
@@ -72,6 +72,10 @@ router.post("/login", async (req, res) => {
             req.body.email,
             req.body.password
         );
+        if(!user){
+            return res.status(404).send('email or password not found')
+        }
+
         const token = await user.genAuthToken();
 
         res.header("x-auth", token).status(200).send();
@@ -105,7 +109,7 @@ router.post("/recovery", async (req, res) => {
             to: user.email.toString(),
             subject: "recoveryPassword",
             text: `for reset password please click on below link\n\n  
-            http://${req.headers.host}/reset/${token}`,
+            http://localhost:3000/reset/${token}`,
         };
 
         await transporter.sendMail(mailOptions, function (error, info) {
@@ -123,12 +127,14 @@ router.post("/recovery", async (req, res) => {
     }
 });
 
-router.post("/reset/:token", async (req, res) => {
+router.post("/reset", async (req, res) => {
+     
     try {
+
         const { error } = await RecoveryPasswordValidator(req.body);
         if (error) return res.status(400).send(error.details[0].message);
         let user = await User.findOne({
-            forgetToken: req.params.token,
+            forgetToken: req.query.token,
             forgetExpire: { $gt: Date.now() },
         });
         if (!user) {
