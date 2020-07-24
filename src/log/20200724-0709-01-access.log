@@ -1,0 +1,5 @@
+::1 - - [24/Jul/2020:02:38:36 +0000] "POST /api/auth/register HTTP/1.1" 400 25 "-" "PostmanRuntime/7.26.2"
+::1 - - [24/Jul/2020:02:38:36 +0000] "POST /api/auth/register HTTP/1.1" 400 25 "-" "PostmanRuntime/7.26.2"
+::1 - - [24/Jul/2020:02:38:37 +0000] "POST /api/auth/register HTTP/1.1" 400 25 "-" "PostmanRuntime/7.26.2"
+::1 - - [24/Jul/2020:02:38:38 +0000] "POST /api/auth/register HTTP/1.1" 400 25 "-" "PostmanRuntime/7.26.2"
+::1 - - [24/Jul/2020:02:38:39 +0000] "POST /api/auth/register HTTP/1.1" 400 25 "-" "PostmanRuntime/7.26.2"
